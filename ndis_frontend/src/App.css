@@ -1,0 +1,20 @@
+/* Theme: default primary (purple) – overridden by App when accent/custom changes */
+:root {
+  --color-primary-50: #faf5f9;
+  --color-primary-100: #f4e8f1;
+  --color-primary-200: #ead2e3;
+  --color-primary-300: #d9a9c8;
+  --color-primary-400: #c47aa8;
+  --color-primary-500: #80276c;
+  --color-primary-600: #7a2466;
+  --color-primary-700: #6b2057;
+  --color-primary-800: #5a1b49;
+  --color-primary-900: #4a163c;
+}
+
+.app.theme-dark {
+  @apply bg-slate-950 text-slate-100;
+}
+.app.theme-dark .main-content {
+  @apply text-slate-100;
+}
