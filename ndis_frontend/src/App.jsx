@@ -68,6 +68,8 @@ function App() {
         <main className="main-content flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12 max-w-6xl mx-auto w-full">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/ndis_frontend/home" element={<Home />} />
+            <Route path="/ndis_frontend" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
