@@ -4,6 +4,7 @@ import { FrappeProvider } from 'frappe-react-sdk'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import CustomCursor from './components/CustomCursor'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -64,6 +65,7 @@ function App() {
         className={`min-h-screen flex flex-col ${appClassName}`}
         style={accentStyle}
       >
+        <CustomCursor />
         <Navbar />
         <main className="main-content flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12 max-w-6xl mx-auto w-full">
           <Routes>

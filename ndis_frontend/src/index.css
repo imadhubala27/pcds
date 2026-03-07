@@ -20,3 +20,88 @@
     transition: color 0.2s ease;
   }
 }
+
+/* Custom cursor – pointer shape, smooth and attractive */
+.app {
+  cursor: none;
+}
+
+@media (hover: none) or (pointer: coarse) {
+  .app {
+    cursor: auto;
+  }
+  .custom-cursor {
+    display: none;
+  }
+}
+
+.custom-cursor {
+  --cursor-size: 28px;
+  --tip-x: 4.67px;
+  --tip-y: 4.67px;
+  position: fixed;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(calc(-1 * var(--tip-x)), calc(-1 * var(--tip-y)));
+  transition: transform 0.12s ease-out;
+}
+
+.custom-cursor__glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  margin-left: -6px;
+  margin-top: -6px;
+  background: radial-gradient(
+    circle,
+    var(--color-primary-400, #a78bfa) 0%,
+    transparent 70%
+  );
+  opacity: 0.35;
+  border-radius: 50%;
+  filter: blur(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.custom-cursor--hover .custom-cursor__glow {
+  opacity: 0.5;
+  transform: scale(1.15);
+}
+
+.custom-cursor__pointer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+  transition: transform 0.2s ease;
+}
+
+.custom-cursor--hover .custom-cursor__pointer {
+  transform: scale(1.2);
+}
+
+.custom-cursor__arrow {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.custom-cursor__tip {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--color-primary-600, #5b21b6);
+  pointer-events: none;
+}
