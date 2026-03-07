@@ -1,8 +1,8 @@
 function Contact() {
   return (
     <div className="space-y-12">
-      <header className="text-center py-8 md:py-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">Contact us</h1>
+      <header className="text-center py-6 sm:py-8 md:py-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 mb-3">Contact us</h1>
         <p className="text-slate-600 text-lg max-w-2xl mx-auto">
           Share a few details and we&apos;ll connect you with the right member of our team.
         </p>
@@ -44,7 +44,7 @@ function Contact() {
               </div>
               <button
                 type="submit"
-                className="w-full md:w-auto px-8 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                className="w-full md:w-auto min-h-[44px] px-8 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 touch-manipulation"
               >
                 Submit enquiry
               </button>

@@ -7,6 +7,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
   body {
     margin: 0;
@@ -15,9 +16,16 @@
     -moz-osx-font-smoothing: grayscale;
     color: #1e293b;
     background-color: #ffffff;
+    overflow-x: hidden;
+    min-height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
   a {
     transition: color 0.2s ease;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 

@@ -45,7 +45,7 @@ function Home() {
   return (
     <div className="space-y-20 md:space-y-28">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 text-white px-6 py-16 md:py-24 lg:px-12 lg:py-28">
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 text-white px-4 py-12 sm:px-6 sm:py-16 md:py-24 lg:px-12 lg:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_50%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent" />
         <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
@@ -53,23 +53,23 @@ function Home() {
             <p className="text-primary-200 text-sm font-semibold uppercase tracking-[0.2em]">
               Trusted Disability Support Provider
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
               Elevating care through{' '}
               <span className="text-white drop-shadow-sm">reliable services</span>.
             </h1>
             <p className="text-primary-100 text-lg max-w-xl leading-relaxed">
               We connect people with tailored disability support services, ensuring consistent quality, clear communication, and measurable outcomes.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <Link
                 to="/services"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold bg-white text-primary-600 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold bg-white text-primary-600 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 touch-manipulation"
               >
                 View Services
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold border-2 border-white/80 text-white hover:bg-white/15 backdrop-blur-sm transition-all duration-200"
+                className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold border-2 border-white/80 text-white hover:bg-white/15 backdrop-blur-sm transition-all duration-200 touch-manipulation"
               >
                 Talk to our team
               </Link>
@@ -135,7 +135,7 @@ function Home() {
       </section>
 
       {/* Why choose us */}
-      <section className="rounded-3xl bg-gradient-to-b from-slate-50 to-white py-16 md:py-20 px-6 border border-slate-100">
+      <section className="rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-50 to-white py-12 sm:py-16 md:py-20 px-4 sm:px-6 border border-slate-100 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             <div>
@@ -195,24 +195,24 @@ function Home() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-3xl bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white p-8 md:p-12 lg:p-14 shadow-glow">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">Ready to modernise your services?</h2>
-            <p className="text-primary-100">
+      <section className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 text-white p-6 sm:p-8 md:p-12 lg:p-14 shadow-glow overflow-hidden">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-6 sm:gap-8">
+          <div className="text-center md:text-left">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Ready to modernise your services?</h2>
+            <p className="text-primary-100 text-sm sm:text-base">
               Speak with our team to design a service model that fits your organisation.
             </p>
           </div>
-          <div className="flex flex-wrap gap-4 shrink-0">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 shrink-0 justify-center md:justify-end">
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold bg-white text-primary-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              className="inline-flex items-center justify-center px-6 py-3.5 min-h-[44px] rounded-xl font-semibold bg-white text-primary-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 touch-manipulation"
             >
               Book a conversation
             </Link>
             <Link
               to="/signup"
-              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold border-2 border-white/80 text-white hover:bg-white/15 transition-all duration-200"
+              className="inline-flex items-center justify-center px-6 py-3.5 min-h-[44px] rounded-xl font-semibold border-2 border-white/80 text-white hover:bg-white/15 transition-all duration-200 touch-manipulation"
             >
               Create an account
             </Link>

@@ -6,9 +6,9 @@ const team = [
 
 function About() {
   return (
-    <div className="space-y-16 md:space-y-24">
-      <header className="text-center py-8 md:py-12 bg-gradient-to-b from-slate-50 to-white rounded-3xl border border-slate-100 -mx-4 px-4 md:-mx-6 md:px-6">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">About Perfection Care Disability Services</h1>
+    <div className="space-y-12 sm:space-y-16 md:space-y-24 overflow-hidden">
+      <header className="text-center py-8 md:py-12 bg-gradient-to-b from-slate-50 to-white rounded-2xl sm:rounded-3xl border border-slate-100 -mx-1 px-4 sm:-mx-2 sm:px-6 md:-mx-6 md:px-6">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-3 px-2">About Perfection Care Disability Services</h1>
         <p className="text-slate-600 text-lg max-w-2xl mx-auto">
           We exist to make high-quality services easier to deliver, easier to access, and easier to trust.
         </p>
@@ -38,7 +38,7 @@ function About() {
         </div>
       </section>
 
-      <section className="rounded-3xl bg-gradient-to-b from-slate-50 to-white py-16 px-6 border border-slate-100">
+      <section className="rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-50 to-white py-12 sm:py-16 px-4 sm:px-6 border border-slate-100">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">Our leadership team</h2>
           <p className="text-slate-600">Experienced leaders from care, operations, and technology.</p>

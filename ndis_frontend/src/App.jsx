@@ -62,12 +62,12 @@ function App() {
   return (
     <FrappeProvider>
       <div
-        className={`min-h-screen flex flex-col ${appClassName}`}
+        className={`min-h-screen flex flex-col overflow-x-hidden ${appClassName}`}
         style={accentStyle}
       >
         <CustomCursor />
         <Navbar />
-        <main className="main-content flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12 max-w-6xl mx-auto w-full">
+        <main className="main-content flex-1 min-w-0 px-4 py-6 sm:py-8 md:px-6 md:py-10 lg:px-8 lg:py-12 max-w-6xl mx-auto w-full">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/ndis_frontend/home" element={<Home />} />

@@ -133,10 +133,10 @@ function Auth({ mode }) {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center py-12">
+    <div className="min-h-[70vh] flex items-center justify-center py-8 sm:py-12 px-2 sm:px-4">
       <div className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 mb-2">
             {isLogin ? 'Welcome back to Perfection Care' : 'Create your Perfection Care account'}
           </h1>
           <p className="text-slate-600">
@@ -146,7 +146,7 @@ function Auth({ mode }) {
           </p>
         </div>
 
-        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-glass-lg p-6 md:p-8">
+        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-glass-lg p-4 sm:p-6 md:p-8">
           <div className="flex p-1 rounded-xl bg-slate-100 mb-6">
             <Link
               to="/login"
@@ -252,7 +252,7 @@ function Auth({ mode }) {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation"
               >
                 Sign in
               </button>
@@ -416,7 +416,7 @@ function Auth({ mode }) {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation"
               >
                 Create account
               </button>
