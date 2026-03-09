@@ -1,4 +1,18 @@
+import { useEffect, useState } from 'react'
+import { getWebsiteSettings } from '../erp_services/erp'
+
 function Contact() {
+  const [websiteSettings, setWebsiteSettings] = useState(null)
+
+  useEffect(() => {
+    getWebsiteSettings().then(setWebsiteSettings)
+  }, [])
+
+  const address = websiteSettings?.address ?? ''
+  const phoneNo = websiteSettings?.phone_no ?? ''
+  const email = websiteSettings?.email ?? ''
+  const addressLines = address ? address.trim().split('\n').filter(Boolean) : []
+
   return (
     <div className="space-y-12">
       <header className="text-center py-6 sm:py-8 md:py-12">
@@ -55,14 +69,26 @@ function Contact() {
             <div className="rounded-2xl bg-white border border-slate-200/80 shadow-glass p-6 md:p-8">
               <h2 className="text-lg font-semibold text-slate-800 mb-4">Our details</h2>
               <ul className="space-y-2 text-slate-600">
-                <li>Level 12, 200 Market Street</li>
-                <li>Melbourne VIC 3000, Australia</li>
-                <li>Phone: +61 3 9000 1234</li>
-                <li>
-                  <a href="mailto:hello@perfectioncare.co" className="text-primary-600 hover:text-primary-700 font-medium">
-                    hello@perfectioncare.co
-                  </a>
-                </li>
+                {addressLines.length > 0 ? addressLines.map((line, i) => <li key={i}>{line.trim()}</li>) : (
+                  <>
+                    <li>Level 12, 200 Market Street</li>
+                    <li>Melbourne VIC 3000, Australia</li>
+                  </>
+                )}
+                {phoneNo ? <li>Phone: {phoneNo}</li> : <li>Phone: +61 3 9000 1234</li>}
+                {email ? (
+                  <li>
+                    <a href={`mailto:${email}`} className="text-primary-600 hover:text-primary-700 font-medium">
+                      {email}
+                    </a>
+                  </li>
+                ) : (
+                  <li>
+                    <a href="mailto:hello@perfectioncare.co" className="text-primary-600 hover:text-primary-700 font-medium">
+                      hello@perfectioncare.co
+                    </a>
+                  </li>
+                )}
               </ul>
             </div>
             <div className="rounded-2xl bg-white border border-slate-200/80 shadow-glass p-6 md:p-8">

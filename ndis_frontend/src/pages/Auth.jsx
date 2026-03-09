@@ -1,44 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { login as erpLogin, signup as erpSignup } from '../erp_services/erp'
+import { getApiErrorMessage } from '../utils/apiHelper'
 
-const USER_STORAGE_KEY = 'pcds_user'
 const CURRENT_USER_STORAGE_KEY = 'pcds_current_user'
 
 function Auth({ mode }) {
   const isLogin = mode === 'login'
   const navigate = useNavigate()
 
-  const [storedUser, setStoredUser] = useState(null)
-
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
 
   const [signupName, setSignupName] = useState('')
   const [signupEmail, setSignupEmail] = useState('')
+  const [signupMobile, setSignupMobile] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('')
   const [signupError, setSignupError] = useState('')
   const [signupSuccess, setSignupSuccess] = useState('')
+  const [signupLoading, setSignupLoading] = useState(false)
 
   const [showLoginPassword, setShowLoginPassword] = useState(false)
   const [showSignupPassword, setShowSignupPassword] = useState(false)
   const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false)
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(USER_STORAGE_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        setStoredUser(parsed)
-        if (parsed?.email) {
-          setLoginEmail(parsed.email)
-        }
-      }
-    } catch (error) {
-      console.error('Failed to read user from localStorage', error)
-    }
-  }, [])
 
   useEffect(() => {
     try {
@@ -52,84 +39,75 @@ function Auth({ mode }) {
   }, [navigate])
 
   useEffect(() => {
-    if (!storedUser) return
-
-    try {
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(storedUser))
-    } catch (error) {
-      console.error('Failed to save user to localStorage', error)
-    }
-  }, [storedUser])
-
-  useEffect(() => {
     setLoginError('')
     setSignupError('')
     setSignupSuccess('')
   }, [isLogin])
 
-  const handleLoginSubmit = (event) => {
+  const handleLoginSubmit = async (event) => {
     event.preventDefault()
-
     setLoginError('')
-
     if (!loginEmail || !loginPassword) {
       setLoginError('Email and Password are required.')
       return
     }
 
-    if (!storedUser) {
-      setLoginError('No account found. Please sign up first.')
-      return
-    }
-
-    const normalizedEmail = loginEmail.trim().toLowerCase()
-
-    if (
-      normalizedEmail === storedUser.email?.trim().toLowerCase() &&
-      loginPassword === storedUser.password
-    ) {
-      try {
-        localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(storedUser))
-        window.dispatchEvent(new Event('pcds-auth-changed'))
-      } catch (error) {
-        console.error('Failed to save current user to localStorage', error)
-      }
+    setLoginLoading(true)
+    try {
+      await erpLogin({ email: loginEmail, password: loginPassword })
+      const userJson = localStorage.getItem('user')
+      const user = userJson ? JSON.parse(userJson) : { email: loginEmail, name: loginEmail }
+      localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(user))
+      window.dispatchEvent(new Event('pcds-auth-changed'))
       navigate('/')
-    } else {
-      setLoginError('Invalid Email or Password')
+    } catch (err) {
+      const msg = getApiErrorMessage(err)
+      setLoginError(err?.response?.data?.message || msg || 'Invalid email or password.')
+    } finally {
+      setLoginLoading(false)
     }
   }
 
-  const handleSignupSubmit = (event) => {
+      try {
+      } catch (error) {
+        console.error('Failed to save current user to localStorage', error)
+      }
+  const handleSignupSubmit = async (event) => {
     event.preventDefault()
-
     setSignupError('')
     setSignupSuccess('')
-
     if (!signupName || !signupEmail || !signupPassword || !signupConfirmPassword) {
       setSignupError('All fields are required.')
       return
     }
-
     if (signupPassword !== signupConfirmPassword) {
       setSignupError('Passwords do not match.')
       return
     }
-
-    const newUser = {
-      name: signupName.trim(),
-      email: signupEmail.trim().toLowerCase(),
-      password: signupPassword,
+    setSignupLoading(true)
+    try {
+      const result = await erpSignup({
+        full_name: signupName.trim(),
+        email: signupEmail.trim().toLowerCase(),
+        phone: signupMobile.trim(),
+        password: signupPassword,
+      })
+      if (result.success) {
+        setSignupSuccess(result.message || 'Account created successfully. Redirecting to sign in...')
+        setSignupName('')
+        setSignupEmail('')
+        setSignupMobile('')
+        setSignupPassword('')
+        setSignupConfirmPassword('')
+        setTimeout(() => navigate('/login'), 1500)
+      } else {
+        setSignupError(result.error || 'Signup failed.')
+      }
+    } catch (err) {
+      setSignupError(getApiErrorMessage(err) || 'Signup failed.')
+    } finally {
+      setSignupLoading(false)
     }
-
-    setStoredUser(newUser)
-    setSignupSuccess('Account created successfully. Redirecting to sign in...')
-
-    setSignupName('')
-    setSignupPassword('')
-    setSignupConfirmPassword('')
-
-    navigate('/login')
   }
 
   return (
@@ -252,10 +230,16 @@ function Auth({ mode }) {
 
               <button
                 type="submit"
-                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation"
+                disabled={loginLoading}
+                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation disabled:opacity-70"
               >
-                Sign in
+                {loginLoading ? 'Signing in...' : 'Sign in'}
               </button>
+              <p className="text-center text-sm text-slate-500">
+                <Link to="/forgot-password" className="font-medium text-primary-600 hover:text-primary-700">
+                  Forgot password?
+                </Link>
+              </p>
             </form>
           ) : (
             <form onSubmit={handleSignupSubmit} className="space-y-5">
@@ -286,6 +270,20 @@ function Auth({ mode }) {
                   required
                   value={signupEmail}
                   onChange={(event) => setSignupEmail(event.target.value)}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label htmlFor="signup-mobile" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Mobile number
+                </label>
+                <input
+                  id="signup-mobile"
+                  type="tel"
+                  placeholder="e.g. 0400 000 000"
+                  autoComplete="tel"
+                  value={signupMobile}
+                  onChange={(event) => setSignupMobile(event.target.value)}
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
                 />
               </div>
@@ -416,9 +414,10 @@ function Auth({ mode }) {
 
               <button
                 type="submit"
-                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation"
+                disabled={signupLoading}
+                className="w-full min-h-[44px] py-3.5 rounded-xl font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 touch-manipulation disabled:opacity-70"
               >
-                Create account
+                {signupLoading ? 'Creating account...' : 'Create account'}
               </button>
             </form>
           )}

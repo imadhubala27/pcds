@@ -12,6 +12,11 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Settings from './pages/Settings'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import TermsAndConditions from './pages/TermsAndConditions'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import Testimonials from './pages/Testimonials'
 import { ACCENT_PRESETS, paletteFromHex } from './themeColors'
 
 function App() {
@@ -70,13 +75,16 @@ function App() {
         <main className="main-content flex-1 min-w-0 px-4 py-6 sm:py-8 md:px-6 md:py-10 lg:px-8 lg:py-12 max-w-6xl mx-auto w-full">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/ndis_frontend/home" element={<Home />} />
-            <Route path="/ndis_frontend" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/testimonials" element={<Testimonials />} />
             <Route
               path="/settings"
               element={

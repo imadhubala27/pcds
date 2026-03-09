@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import pcdsLogo from '../assets/img/pcds.jpeg'
+import { getWebsiteSettings, getErpFileUrl, logout as erpLogout } from '../erp_services/erp'
 
 const CURRENT_USER_STORAGE_KEY = 'pcds_current_user'
 
@@ -17,8 +18,13 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [websiteSettings, setWebsiteSettings] = useState(null)
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    getWebsiteSettings().then(setWebsiteSettings)
+  }, [])
 
   useEffect(() => {
     if (!userMenuOpen) return
@@ -61,6 +67,7 @@ function Navbar() {
 
   const handleLogout = () => {
     try {
+      erpLogout()
       localStorage.removeItem(CURRENT_USER_STORAGE_KEY)
       window.dispatchEvent(new Event('pcds-auth-changed'))
     } catch (error) {
@@ -82,9 +89,10 @@ function Navbar() {
           className="flex items-center gap-2 sm:gap-3 group min-w-0"
         >
           <img
-            src={pcdsLogo}
+            src={websiteSettings?.app_logo ? getErpFileUrl(websiteSettings.app_logo) : pcdsLogo}
             alt="Perfection Care Disability Services logo"
             className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-cover shadow-lg shadow-primary-500/25 transition-all duration-300 group-hover:scale-105 group-hover:shadow-primary-500/30 flex-shrink-0"
+            onError={(e) => { e.target.onerror = null; e.target.src = pcdsLogo }}
           />
           <div className="flex flex-col min-w-0">
             <span className="font-semibold text-slate-800 tracking-tight truncate text-sm sm:text-base">Perfection Care</span>

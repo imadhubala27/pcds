@@ -248,4 +248,8 @@ app_license = "mit"
 # ignore_translatable_strings_from = []
 
 
-website_route_rules = [{'from_route': '/ndis_frontend/<path:app_path>', 'to_route': 'ndis_frontend'},]
+# Serve React frontend at /pcds (URL: e.g. 127.0.0.1:8007/pcds#/ or /pcds#/services). HashRouter uses #/ for routes.
+website_route_rules = [
+	{'from_route': '/pcds', 'to_route': 'ndis_frontend'},
+	{'from_route': '/pcds/<path:app_path>', 'to_route': 'ndis_frontend'},
+]

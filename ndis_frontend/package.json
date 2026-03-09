@@ -12,6 +12,7 @@
     "copy-html-entry": "cp ../ndis_web/public/ndis_frontend/index.html ../ndis_web/www/ndis_frontend.html"
   },
   "dependencies": {
+    "axios": "^1.7.0",
     "frappe-react-sdk": "^1.14.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
