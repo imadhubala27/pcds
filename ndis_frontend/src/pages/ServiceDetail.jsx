@@ -89,7 +89,7 @@ function ServiceDetail() {
       )}
 
       {service.description && (
-        <section className="prose max-w-none prose-slate">
+        <section className="prose max-w-none prose-slate [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-disc [&_ol]:ml-6 [&_li]:marker:text-slate-600">
           <div dangerouslySetInnerHTML={{ __html: service.description }} />
         </section>
       )}
