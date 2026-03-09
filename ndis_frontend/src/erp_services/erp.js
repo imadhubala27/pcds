@@ -326,6 +326,59 @@ export async function getHomeHero() {
 }
 
 // ---------------------------------------------------------------------------
+// Services – list & detail (Services DocType)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch all Services records for the website.
+ * Fields: name, title, subtitle, image, description.
+ * @returns {Promise<{ success: boolean, data: Array }>}
+ */
+export async function getServices() {
+  const fallback = { success: false, data: [] }
+  try {
+    const res = await callERPMethod('ndis_erp.ndis_erp.api.get_services', {}, { method: 'GET' })
+    const msg = res?.message
+    if (msg?.success && Array.isArray(msg.data)) {
+      return { success: true, data: msg.data }
+    }
+    return fallback
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getServices failed', getApiErrorMessage(err))
+    }
+    return fallback
+  }
+}
+
+/**
+ * Fetch one Service by name (docname / title).
+ * @param {string} name - Docname of the Service (usually same as Title).
+ * @returns {Promise<{ success: boolean, data?: object, error?: string }>}
+ */
+export async function getService(name) {
+  const fallback = { success: false, data: null, error: 'Service not found' }
+  if (!name) return fallback
+  try {
+    const res = await callERPMethod(
+      'ndis_erp.ndis_erp.api.get_service',
+      { name },
+      { method: 'GET' }
+    )
+    const msg = res?.message
+    if (msg?.success && msg.data) {
+      return { success: true, data: msg.data }
+    }
+    return { success: false, data: null, error: msg?.error || 'Service not found' }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getService failed', getApiErrorMessage(err))
+    }
+    return fallback
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Signup, Forgot password, Reset password (ERP APIs)
 // ---------------------------------------------------------------------------
 
@@ -372,6 +425,32 @@ export async function resetPassword(data) {
   const msg = res?.message
   if (msg?.success) return { success: true, message: msg.message }
   return { success: false, error: msg?.error || 'Reset failed' }
+}
+
+/**
+ * Submit Contact Us enquiry: creates a Lead in ERP.
+ * @param {{ first_name: string, middle_name?: string, last_name: string, full_name?: string, email: string, mobile: string, country: string, message: string }} data
+ * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
+ */
+export async function submitContactEnquiry(data) {
+  const payload = {
+    first_name: (data.first_name || '').trim(),
+    middle_name: (data.middle_name || '').trim(),
+    last_name: (data.last_name || '').trim(),
+    full_name: (data.full_name || '').trim(),
+    email: (data.email || '').trim().toLowerCase(),
+    mobile: (data.mobile || '').trim(),
+    country: (data.country || '').trim(),
+    message: (data.message || '').trim(),
+  }
+  const res = await callERPMethod(
+    'ndis_erp.ndis_erp.api.submit_contact_enquiry',
+    payload,
+    { method: 'POST' }
+  )
+  const msg = res?.message
+  if (msg?.success) return { success: true, message: msg.message }
+  return { success: false, error: msg?.error || 'Something went wrong. Please try again.' }
 }
 
 // ---------------------------------------------------------------------------
