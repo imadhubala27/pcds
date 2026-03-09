@@ -241,6 +241,90 @@ export async function getWebsiteSettings() {
   }
 }
 
+/**
+ * Fetch home page builder data (Page Building Blocks) by route.
+ * Same as krishna_royal_club get_home_page_builder?route=home.
+ * @param {string} [route='home']
+ * @returns {Promise<{ success: boolean, data: Array<{ web_template: string, values: object, background_image: string, add_background_image: number }>, count: number }>}
+ */
+export async function getHomePageBuilder(route = 'home') {
+  try {
+    const res = await callERPMethod('ndis_erp.ndis_erp.api.get_home_page_builder', { route }, { method: 'GET' })
+    const msg = res?.message
+    if (msg?.success && Array.isArray(msg.data)) {
+      return { success: true, data: msg.data, count: msg.count ?? msg.data.length }
+    }
+    return { success: true, data: [], count: 0 }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getHomePageBuilder failed', getApiErrorMessage(err))
+    }
+    return { success: true, data: [], count: 0 }
+  }
+}
+
+/**
+ * Map one page builder block (Hero) to hero slide shape for the frontend.
+ * @param {{ values: object, background_image?: string }} block
+ * @returns {{ welcome_text: string, title: string, description: string, primary_button_text: string, primary_button_link: string, secondary_button_text: string, secondary_button_link: string, image: string, align: string }}
+ */
+function blockToHeroSlide(block) {
+  const v = block?.values || {}
+  return {
+    welcome_text: v.welcome_text || v['Welcome Text'] || '',
+    title: v.title || v.Title || '',
+    description: (v.description || v.subtitle || v.Subtitle || '').trim(),
+    primary_button_text: v.primary_action_label || v['Primary Action Label'] || v.primary_button_text || '',
+    primary_button_link: v.primary_action_url || v['Primary Action URL'] || v.primary_button_link || '',
+    secondary_button_text: v.secondary_action_label || v['Secondary Action Label'] || v.secondary_button_text || '',
+    secondary_button_link: v.secondary_action_url || v['Secondary Action URL'] || v.secondary_button_link || '',
+    image: block.background_image || v.image || '',
+    align: v.align || v.Align || 'Left',
+  }
+}
+
+/**
+ * Fetch home page hero content (left text, right image). Multiple Hero blocks = slider.
+ * Uses get_home_page_builder(route=home) and maps Hero blocks to slides; fallback get_home_hero.
+ * @returns {Promise<{ success: boolean, slides: Array }>}
+ */
+export async function getHomeHero() {
+  const defaultSlides = [
+    {
+      welcome_text: 'Welcome to Perfection Care',
+      title: 'Elevating care through reliable services',
+      description: 'We connect people with tailored disability support services, ensuring consistent quality, clear communication, and measurable outcomes.',
+      primary_button_text: 'View Services',
+      primary_button_link: '/services',
+      secondary_button_text: 'Talk to Our Team',
+      secondary_button_link: '/contact',
+      image: '',
+      align: 'Left',
+    },
+  ]
+  try {
+    const builder = await getHomePageBuilder('home')
+    if (builder?.data?.length) {
+      const slides = builder.data
+        .filter((b) => (b.web_template || '').toLowerCase().includes('hero'))
+        .map((b) => blockToHeroSlide(b))
+        .filter((s) => s.title)
+      if (slides.length) return { success: true, slides }
+    }
+    const data = await callERPMethod('ndis_erp.ndis_erp.api.get_home_hero', {}, { method: 'GET' })
+    const msg = data?.message
+    if (msg?.success && Array.isArray(msg.slides) && msg.slides.length > 0) {
+      return { success: true, slides: msg.slides }
+    }
+    return { success: true, slides: defaultSlides }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getHomeHero failed', getApiErrorMessage(err))
+    }
+    return { success: true, slides: defaultSlides }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Signup, Forgot password, Reset password (ERP APIs)
 // ---------------------------------------------------------------------------

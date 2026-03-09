@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
 import { services } from '../services/services'
+import { getHomeHero, getErpFileUrl } from '../erp_services/erp'
 
 const featuredServices = services.slice(0, 3)
 
@@ -42,68 +44,127 @@ const testimonials = [
 ]
 
 function Home() {
+  const [heroSlides, setHeroSlides] = useState([])
+  const [heroIndex, setHeroIndex] = useState(0)
+
+  useEffect(() => {
+    getHomeHero().then((res) => {
+      if (res?.slides?.length) setHeroSlides(res.slides)
+    })
+  }, [])
+
+  const slide = heroSlides.length ? (heroSlides[heroIndex] || heroSlides[0]) : {
+    welcome_text: 'Welcome to Perfection Care',
+    title: 'Elevating care through reliable services',
+    description: 'We connect people with tailored disability support services, ensuring consistent quality, clear communication, and measurable outcomes.',
+    primary_button_text: 'View Services',
+    primary_button_link: '/services',
+    secondary_button_text: 'Talk to Our Team',
+    secondary_button_link: '/contact',
+    image: '',
+    align: 'Left',
+  }
+  const isSlider = heroSlides.length > 1
+
+  const goPrev = () => setHeroIndex((i) => (i <= 0 ? heroSlides.length - 1 : i - 1))
+  const goNext = () => setHeroIndex((i) => (i >= heroSlides.length - 1 ? 0 : i + 1))
+
+  const textAlign = (slide?.align || "").toLowerCase() === "center" ? "text-center" : (slide?.align || "").toLowerCase() === "right" ? "text-right" : "text-left"
+  // Alternate layout per slide: 1st = text left / image right, 2nd = image left / text right, 3rd = text left again, etc.
+  const isImageLeft = isSlider && heroIndex % 2 === 1
+
   return (
     <div className="space-y-20 md:space-y-28">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 text-white px-4 py-12 sm:px-6 sm:py-16 md:py-24 lg:px-12 lg:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_50%)]" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent" />
-        <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
-          <div className="space-y-6 animate-fade-in">
-            <p className="text-primary-200 text-sm font-semibold uppercase tracking-[0.2em]">
-              Trusted Disability Support Provider
-            </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-              Elevating care through{' '}
-              <span className="text-white drop-shadow-sm">reliable services</span>.
-            </h1>
-            <p className="text-primary-100 text-lg max-w-xl leading-relaxed">
-              We connect people with tailored disability support services, ensuring consistent quality, clear communication, and measurable outcomes.
-            </p>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Link
-                to="/services"
-                className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold bg-white text-primary-600 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 touch-manipulation"
-              >
-                View Services
-              </Link>
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold border-2 border-white/80 text-white hover:bg-white/15 backdrop-blur-sm transition-all duration-200 touch-manipulation"
-              >
-                Talk to our team
-              </Link>
+      {/* Hero: full width; odd slides = text left + image right, even slides = image left + text right */}
+      <div className="w-screen relative left-1/2 -translate-x-1/2 max-w-none">
+        <section className="relative overflow-hidden bg-slate-900 text-white px-4 py-12 sm:px-6 sm:py-16 md:py-24 lg:px-12 lg:py-28 min-h-[28rem] sm:min-h-[32rem]">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.06)_0%,_transparent_50%)]" />
+          <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
+            {/* Text block: order-2 when image is on left (so it appears on right) */}
+            <div className={`space-y-5 lg:space-y-6 ${textAlign} ${isImageLeft ? 'lg:order-2' : 'lg:order-1'}`}>
+              {slide?.welcome_text && (
+                <p className="text-amber-400/95 text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] flex items-center gap-2" style={slide?.align === "Center" ? { justifyContent: "center" } : slide?.align === "Right" ? { justifyContent: "flex-end" } : undefined}>
+                  <span className="inline-block w-8 h-px bg-amber-400/60" />
+                  {slide.welcome_text}
+                </p>
+              )}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white">
+                {slide?.title || 'Elevating care through reliable services'}
+              </h1>
+              {slide?.description && (
+                <p className="text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed" style={slide?.align === "Center" ? { marginLeft: "auto", marginRight: "auto" } : slide?.align === "Right" ? { marginLeft: "auto" } : undefined}>
+                  {slide.description}
+                </p>
+              )}
+              <div className={`flex flex-wrap gap-3 sm:gap-4 pt-1 ${slide?.align === "Center" ? "justify-center" : slide?.align === "Right" ? "justify-end" : ""}`}>
+                {slide?.primary_button_text && (
+                  <Link
+                    to={slide.primary_button_link || '/services'}
+                    className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold bg-amber-500 text-slate-900 shadow-lg hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 touch-manipulation"
+                  >
+                    {slide.primary_button_text}
+                  </Link>
+                )}
+                {slide?.secondary_button_text && (
+                  <Link
+                    to={slide.secondary_button_link || '/contact'}
+                    className="inline-flex items-center justify-center px-5 py-3.5 min-h-[44px] rounded-xl font-semibold border-2 border-amber-500/80 text-white hover:bg-amber-500/15 transition-all duration-200 touch-manipulation"
+                  >
+                    {slide.secondary_button_text}
+                  </Link>
+                )}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-8 pt-4">
-              {[
-                { value: '250+', label: 'Active clients' },
-                { value: '98%', label: 'Satisfaction score' },
-                { value: '10yrs', label: 'Industry experience' },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-2xl md:text-3xl font-bold">{value}</p>
-                  <p className="text-sm text-primary-200">{label}</p>
+            {/* Image block: order-1 when image left, order-2 when image right */}
+            <div className={`hidden lg:block relative ${isImageLeft ? 'lg:order-1' : 'lg:order-2'}`}>
+              {slide?.image ? (
+                <img
+                  src={getErpFileUrl(slide.image)}
+                  alt=""
+                  className={`w-full max-w-lg rounded-2xl object-cover shadow-2xl ${isImageLeft ? 'mr-auto' : 'ml-auto'}`}
+                />
+              ) : (
+                <div className={`w-full max-w-lg rounded-2xl bg-slate-700/50 border border-slate-600/50 aspect-[4/3] flex items-center justify-center text-slate-500 text-sm ${isImageLeft ? 'mr-auto' : 'ml-auto'}`}>
+                  Hero image
                 </div>
-              ))}
+              )}
             </div>
           </div>
-          <div className="hidden lg:block">
-            <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-6 md:p-8 shadow-glass-lg text-white max-w-md ml-auto">
-              <h2 className="text-xl font-bold mb-3">Service at the center</h2>
-              <p className="text-white/90 text-sm mb-4">
-                From onboarding to ongoing delivery, our team partners with you to design services that work in the real world.
-              </p>
-              <ul className="space-y-2 text-sm">
-                {['Dedicated account manager', 'Transparent service reporting', '24/7 support for critical requests'].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <span className="text-primary-300">•</span> {item}
-                  </li>
+
+          {/* Slider arrows and dots when multiple slides */}
+          {isSlider && (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                aria-label="Previous slide"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                aria-label="Next slide"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                {heroSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setHeroIndex(i)}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${i === heroIndex ? 'bg-amber-500' : 'bg-white/40 hover:bg-white/60'}`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
                 ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+              </div>
+            </>
+          )}
+        </section>
+      </div>
 
       {/* Services we provide */}
       <section>
