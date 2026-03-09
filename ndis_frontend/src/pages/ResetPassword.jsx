@@ -12,6 +12,8 @@ function ResetPassword() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const [missingKey, setMissingKey] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
     if (!keyFromUrl.trim()) setMissingKey(true)
@@ -81,33 +83,75 @@ function ResetPassword() {
                 <label htmlFor="reset-password" className="block text-sm font-medium text-slate-700 mb-1.5">
                   New password
                 </label>
-                <input
-                  id="reset-password"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
-                />
+                <div className="relative">
+                  <input
+                    id="reset-password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-11 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-primary-500 focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M3 3l18 18" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M10.584 10.587A2 2 0 0113.414 13.42" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M9.88 5.082A9.716 9.716 0 0112 5c5 0 9 3.5 10 7- .273.995-.78 1.92-1.49 2.73M6.61 6.61C4.43 7.74 2.9 9.54 2 12c.64 1.86 2.01 3.44 3.76 4.57A10.44 10.44 0 0012 19c1.3 0 2.55-.23 3.7-.65" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
               <div>
                 <label htmlFor="reset-confirm" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Confirm new password
                 </label>
-                <input
-                  id="reset-confirm"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
-                />
+                <div className="relative">
+                  <input
+                    id="reset-confirm"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-11 text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-primary-500 focus:outline-none"
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M3 3l18 18" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M10.584 10.587A2 2 0 0113.414 13.42" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M9.88 5.082A9.716 9.716 0 0112 5c5 0 9 3.5 10 7- .273.995-.78 1.92-1.49 2.73M6.61 6.61C4.43 7.74 2.9 9.54 2 12c.64 1.86 2.01 3.44 3.76 4.57A10.44 10.44 0 0012 19c1.3 0 2.55-.23 3.7-.65" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
               <button
