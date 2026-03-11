@@ -379,6 +379,57 @@ export async function getService(name) {
 }
 
 // ---------------------------------------------------------------------------
+// Testimonials – list (Testimonials DocType)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch all Testimonials records for the website.
+ * Fields: name1, role, image, detail, rating.
+ * @returns {Promise<{ success: boolean, data: Array, error?: string }>}
+ */
+export async function getTestimonials() {
+  const fallback = { success: false, data: [], error: 'Failed to load testimonials' }
+  try {
+    const res = await callERPMethod('ndis_erp.ndis_erp.api.get_testimonials', {}, { method: 'GET' })
+    const msg = res?.message
+    if (msg?.success && Array.isArray(msg.data)) {
+      return { success: true, data: msg.data }
+    }
+    return { success: false, data: [], error: msg?.error || fallback.error }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getTestimonials failed', getApiErrorMessage(err))
+    }
+    return fallback
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Web Page – content (Terms / Privacy)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch a published Web Page's rich text content by route.
+ * @param {string} route
+ * @returns {Promise<{ success: boolean, data?: { title: string, route: string, content: string, modified?: string }, error?: string }>}
+ */
+export async function getWebPageContent(route) {
+  const fallback = { success: false, data: null, error: 'Page not found' }
+  if (!route) return fallback
+  try {
+    const res = await callERPMethod('ndis_erp.ndis_erp.api.get_web_page_content', { route }, { method: 'GET' })
+    const msg = res?.message
+    if (msg?.success && msg.data) return { success: true, data: msg.data }
+    return { success: false, data: null, error: msg?.error || fallback.error }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getWebPageContent failed', getApiErrorMessage(err))
+    }
+    return fallback
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Signup, Forgot password, Reset password (ERP APIs)
 // ---------------------------------------------------------------------------
 

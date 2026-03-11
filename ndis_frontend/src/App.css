@@ -18,3 +18,52 @@
 .app.theme-dark .main-content {
   @apply text-slate-100;
 }
+
+/* -----------------------------
+   Global motion & animation
+   ----------------------------- */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-section {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+.animate-hero {
+  animation: fade-in 0.8s ease-out both;
+}
+
+.card-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+.btn-lift {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+.btn-lift:hover {
+  transform: translateY(-1px) scale(1.01);
+}
+.btn-lift:active {
+  transform: translateY(0) scale(0.99);
+}

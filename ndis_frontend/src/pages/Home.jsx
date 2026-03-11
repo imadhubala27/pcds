@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
-import { services } from '../services/services'
-import { getHomeHero, getErpFileUrl } from '../erp_services/erp'
-
-const featuredServices = services.slice(0, 3)
+import { services as fallbackServices } from '../services/services'
+import { getHomeHero, getErpFileUrl, getTestimonials, getServices } from '../erp_services/erp'
 
 const whyChooseUs = [
   {
@@ -30,27 +28,107 @@ const stats = [
   { value: '93%', label: 'Client retention' },
 ]
 
-const testimonials = [
-  {
-    quote: 'ServiceBridge has transformed how we coordinate support. Their team feels like an extension of ours.',
-    name: 'Alex Roberts',
-    role: 'Director, Horizon Care Group',
-  },
-  {
-    quote: 'Professional, responsive, and deeply committed to outcomes. Our staff and participants notice the difference.',
-    name: 'Priya Singh',
-    role: 'Operations Lead, Northside Services',
-  },
-]
+function StarRow({ rating = 0 }) {
+  const raw = Number(rating) || 0
+  const scaled = raw <= 1 && raw > 0 ? raw * 5 : raw
+  const safe = Math.max(0, Math.min(5, scaled))
+  const fullStars = Math.floor(safe)
+  const fraction = safe - fullStars
+  const hasHalf = fraction >= 0.5
+
+  return (
+    <div className="flex items-center gap-1" aria-label={`Rating ${safe.toFixed(1)} out of 5`}>
+      {Array.from({ length: 5 }).map((_, idx) => {
+        const isFull = idx < fullStars
+        const isHalf = !isFull && idx === fullStars && hasHalf
+        return (
+          <div key={idx} className="relative h-4 w-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="h-4 w-4 text-slate-200"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+            {isFull && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className="absolute inset-0 h-4 w-4 text-primary-500"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            )}
+            {isHalf && (
+              <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 text-primary-500"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 function Home() {
   const [heroSlides, setHeroSlides] = useState([])
   const [heroIndex, setHeroIndex] = useState(0)
+  const [homeServices, setHomeServices] = useState(fallbackServices.slice(0, 3))
+  const [loadingServices, setLoadingServices] = useState(true)
+  const [testimonials, setTestimonials] = useState([])
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true)
 
   useEffect(() => {
     getHomeHero().then((res) => {
       if (res?.slides?.length) setHeroSlides(res.slides)
     })
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    setLoadingServices(true)
+    getServices().then((res) => {
+      if (!mounted) return
+      if (res?.success && Array.isArray(res.data) && res.data.length) {
+        setHomeServices(res.data.slice(0, 3))
+      } else {
+        setHomeServices(fallbackServices.slice(0, 3))
+      }
+      setLoadingServices(false)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    setLoadingTestimonials(true)
+    getTestimonials().then((res) => {
+      if (!mounted) return
+      if (res?.success && Array.isArray(res.data)) {
+        setTestimonials(res.data.slice(0, 2))
+      } else {
+        setTestimonials([])
+      }
+      setLoadingTestimonials(false)
+    })
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const slide = heroSlides.length ? (heroSlides[heroIndex] || heroSlides[0]) : {
@@ -174,16 +252,35 @@ function Home() {
             A complete suite of professional services designed for modern organisations and care providers.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredServices.map((service) => (
-            <ServiceCard
-              key={service.id}
-              icon={service.icon}
-              title={service.title}
-              description={service.description}
-            />
-          ))}
-        </div>
+        {loadingServices ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl bg-white border border-slate-200/80 p-6 shadow-sm"
+              >
+                <div className="h-10 w-10 rounded-xl bg-slate-100 animate-pulse mb-4" />
+                <div className="h-4 w-32 bg-slate-100 rounded animate-pulse mb-2" />
+                <div className="h-3 w-full bg-slate-100 rounded animate-pulse mb-1.5" />
+                <div className="h-3 w-5/6 bg-slate-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {homeServices.map((service) => (
+              <ServiceCard
+                key={service.name || service.id}
+                imageUrl={service.image ? getErpFileUrl(service.image) : undefined}
+                icon={!service.image ? service.icon : undefined}
+                title={service.title}
+                subtitle={service.subtitle || service.description}
+                description={service.description}
+                to={service.name ? `/services/${encodeURIComponent(service.name)}` : undefined}
+              />
+            ))}
+          </div>
+        )}
         <div className="text-center mt-10">
           <Link
             to="/services"
@@ -241,18 +338,63 @@ function Home() {
             Stories from organisations that rely on us to deliver quality services every day.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {testimonials.map((t) => (
-            <article
-              key={t.name}
-              className="rounded-2xl bg-white p-6 md:p-8 border border-slate-200/80 shadow-glass hover:shadow-glass-lg hover:border-primary-100 transition-all duration-300"
-            >
-              <p className="text-slate-700 text-lg leading-relaxed mb-6">&ldquo;{t.quote}&rdquo;</p>
-              <p className="font-semibold text-slate-800">{t.name}</p>
-              <p className="text-sm text-slate-500">{t.role}</p>
-            </article>
-          ))}
-        </div>
+        {loadingTestimonials ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl bg-white p-6 md:p-8 border border-slate-200/80 shadow-glass"
+              >
+                <div className="h-4 w-24 bg-slate-100 rounded animate-pulse mb-4" />
+                <div className="space-y-2 mb-6">
+                  <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
+                  <div className="h-3 w-5/6 bg-slate-100 rounded animate-pulse" />
+                  <div className="h-3 w-4/6 bg-slate-100 rounded animate-pulse" />
+                </div>
+                <div className="h-4 w-32 bg-slate-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : testimonials.length === 0 ? (
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-8 text-center text-slate-600">
+            No testimonials available right now.
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {testimonials.map((t) => {
+              const imageUrl = t.image ? getErpFileUrl(t.image) : ''
+              return (
+                <article
+                  key={t.name || t.name1}
+                  className="rounded-2xl bg-white p-6 md:p-8 border border-slate-200/80 shadow-glass hover:shadow-glass-lg hover:border-primary-100 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <StarRow rating={t.rating} />
+                  </div>
+                  <p className="text-slate-700 text-lg leading-relaxed mb-6">&ldquo;{t.detail}&rdquo;</p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary-50 border border-primary-100 overflow-hidden flex items-center justify-center text-sm font-semibold text-primary-700">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={t.name1 || 'Client'}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        (t.name1 || '?').charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-800">{t.name1 || 'Client'}</p>
+                      <p className="text-sm text-slate-500">{t.role}</p>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       {/* CTA */}

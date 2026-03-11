@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 function ServiceCard({ icon, imageUrl, title, subtitle, description, to }) {
   const content = (
-    <article className="group relative rounded-2xl bg-white p-6 md:p-7 border border-slate-200/80 shadow-glass hover:shadow-glass-lg hover:border-primary-200/80 hover:-translate-y-1 transition-all duration-300 h-full">
+    <article className="group relative rounded-2xl bg-white p-6 md:p-7 border border-slate-200/80 shadow-glass hover:shadow-glass-lg hover:border-primary-200/80 transition-all duration-300 h-full card-lift">
       {imageUrl ? (
         <div className="mb-4 overflow-hidden rounded-xl bg-slate-100">
           <img
