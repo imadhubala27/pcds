@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
 import { services as fallbackServices } from '../services/services'
-import { getHomeHero, getErpFileUrl, getTestimonials, getServices } from '../erp_services/erp'
+import { getHomeHero, getErpFileUrl, getTestimonials, getServices, getAboutUs } from '../erp_services/erp'
 
-const whyChooseUs = [
+const whyChooseUsFallback = [
   {
     icon: '💬',
     title: 'Proactive communication',
@@ -90,11 +90,40 @@ function Home() {
   const [loadingServices, setLoadingServices] = useState(true)
   const [testimonials, setTestimonials] = useState([])
   const [loadingTestimonials, setLoadingTestimonials] = useState(true)
+  const [aboutData, setAboutData] = useState(null)
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
 
   useEffect(() => {
     getHomeHero().then((res) => {
       if (res?.slides?.length) setHeroSlides(res.slides)
     })
+  }, [])
+
+  useEffect(() => {
+    if (!heroSlides.length) return
+    const id = setInterval(() => {
+      setHeroIndex((prev) => {
+        const total = heroSlides.length
+        if (total <= 1) return prev
+        return prev >= total - 1 ? 0 : prev + 1
+      })
+    }, 4000)
+    return () => clearInterval(id)
+  }, [heroSlides.length])
+
+  useEffect(() => {
+    let cancelled = false
+    getAboutUs()
+      .then((res) => {
+        if (cancelled) return
+        if (res?.success && res.data) {
+          setAboutData(res.data)
+        }
+      })
+      .catch(() => {
+        // silently fall back to static whyChooseUsFallback
+      })
+    return () => { cancelled = true }
   }, [])
 
   useEffect(() => {
@@ -120,7 +149,8 @@ function Home() {
     getTestimonials().then((res) => {
       if (!mounted) return
       if (res?.success && Array.isArray(res.data)) {
-        setTestimonials(res.data.slice(0, 2))
+        setTestimonials(res.data)
+        setTestimonialIndex(0)
       } else {
         setTestimonials([])
       }
@@ -150,6 +180,38 @@ function Home() {
   const textAlign = (slide?.align || "").toLowerCase() === "center" ? "text-center" : (slide?.align || "").toLowerCase() === "right" ? "text-right" : "text-left"
   // Alternate layout per slide: 1st = text left / image right, 2nd = image left / text right, 3rd = text left again, etc.
   const isImageLeft = isSlider && heroIndex % 2 === 1
+
+  const aboutCards = Array.isArray(aboutData?.aboutus_section) && aboutData.aboutus_section.length
+    ? aboutData.aboutus_section
+    : null
+  const whyItems = aboutCards || whyChooseUsFallback
+  const whySubtitleText =
+    (aboutData?.subtitle || aboutData?.description || '').toString().trim() ||
+    'We combine disciplined delivery with a human, relationship-led approach.'
+  const getWhyIcon = (idx) =>
+    aboutCards ? '✓' : (whyChooseUsFallback[idx]?.icon || '✓')
+
+  const hasTestimonials = testimonials.length > 0
+  const showTestimonialSlider = testimonials.length > 2
+  const safeTestimonialIndex = showTestimonialSlider && hasTestimonials
+    ? ((testimonialIndex % testimonials.length) + testimonials.length) % testimonials.length
+    : 0
+  const slideCount = showTestimonialSlider && hasTestimonials ? Math.ceil(testimonials.length / 2) : 0
+  const currentSlideIndex = showTestimonialSlider && hasTestimonials ? Math.floor(safeTestimonialIndex / 2) : 0
+  const currentTestimonials = showTestimonialSlider && hasTestimonials
+    ? [
+        testimonials[currentSlideIndex * 2],
+        testimonials[currentSlideIndex * 2 + 1],
+      ].filter(Boolean)
+    : []
+
+  useEffect(() => {
+    if (!showTestimonialSlider || !hasTestimonials) return
+    const id = setInterval(() => {
+      setTestimonialIndex((prev) => prev + 2)
+    }, 4000)
+    return () => clearInterval(id)
+  }, [showTestimonialSlider, hasTestimonials, testimonials.length])
 
   return (
     <div className="space-y-20 md:space-y-28">
@@ -299,32 +361,35 @@ function Home() {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">Why partners choose us</h2>
               <p className="text-slate-600 text-lg mb-8">
-                We combine disciplined delivery with a human, relationship-led approach.
+                {whySubtitleText}
               </p>
               <ul className="space-y-6">
-                {whyChooseUs.map((item) => (
-                  <li key={item.title} className="flex gap-4">
+                {whyItems.map((item, idx) => (
+                  <li key={item.title || idx} className="flex gap-4">
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600 text-xl">
-                      {item.icon}
+                      {getWhyIcon(idx)}
                     </span>
                     <div>
                       <h3 className="font-semibold text-slate-800 mb-1">{item.title}</h3>
-                      <p className="text-slate-600 text-sm">{item.description}</p>
+                      <p className="text-slate-600 text-sm">{aboutCards ? item.details : item.description}</p>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {stats.map(({ value, label }) => (
-                <div
-                  key={label}
-                  className="rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 p-6 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
-                >
-                  <p className="text-2xl md:text-3xl font-bold">{value}</p>
-                  <p className="text-sm text-primary-200 mt-1">{label}</p>
+            <div className="flex items-center justify-center">
+              {aboutData?.image ? (
+                <img
+                  src={getErpFileUrl(aboutData.image)}
+                  alt="About us"
+                  className="w-full max-w-md rounded-2xl object-cover shadow-lg border border-slate-100"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full max-w-md rounded-2xl bg-gradient-to-br from-primary-500/5 to-primary-700/10 border border-dashed border-primary-200 flex items-center justify-center text-sm text-primary-700/70 py-16 px-6 text-center">
+                  Configure an image on the About Us page to show it here.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -355,9 +420,81 @@ function Home() {
               </div>
             ))}
           </div>
-        ) : testimonials.length === 0 ? (
+        ) : !hasTestimonials ? (
           <div className="rounded-2xl border border-slate-200/80 bg-white p-8 text-center text-slate-600">
             No testimonials available right now.
+          </div>
+        ) : showTestimonialSlider && currentTestimonials.length > 0 ? (
+          <div className="relative max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6">
+              {currentTestimonials.map((t, idx) => (
+                <article
+                  key={(t.name || t.name1 || safeTestimonialIndex) + '-' + idx}
+                  className="rounded-2xl bg-white p-6 md:p-8 border border-slate-200/80 shadow-glass hover:shadow-glass-lg hover:border-primary-100 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <StarRow rating={t.rating} />
+                  </div>
+                  <p className="text-slate-700 text-lg leading-relaxed mb-6">
+                    &ldquo;{t.detail}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary-50 border border-primary-100 overflow-hidden flex items-center justify-center text-sm font-semibold text-primary-700">
+                      {t.image ? (
+                        <img
+                          src={getErpFileUrl(t.image)}
+                          alt={t.name1 || 'Client'}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        (t.name1 || '?').charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-800">{t.name1 || 'Client'}</p>
+                      <p className="text-sm text-slate-500">{t.role}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setTestimonialIndex((i) => i - 1)}
+              className="absolute -left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50 transition-colors hidden sm:flex items-center justify-center"
+              aria-label="Previous testimonial"
+            >
+              <span className="sr-only">Previous testimonials</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTestimonialIndex((i) => i + 1)}
+              className="absolute -right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50 transition-colors hidden sm:flex items-center justify-center"
+              aria-label="Next testimonial"
+            >
+              <span className="sr-only">Next testimonials</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <div className="flex justify-center gap-2 mt-6">
+              {Array.from({ length: slideCount }).map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setTestimonialIndex(idx * 2)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                    idx === currentSlideIndex ? 'bg-primary-500' : 'bg-slate-300 hover:bg-slate-400'
+                  }`}
+                  aria-label={`Go to testimonial slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">

@@ -220,6 +220,7 @@ export async function getWebsiteSettings() {
     address: '',
     phone_no: '',
     email: '',
+    company_description: '',
   }
   try {
     const data = await callERPMethod('ndis_erp.ndis_erp.api.get_website_settings', {}, { method: 'GET' })
@@ -232,6 +233,7 @@ export async function getWebsiteSettings() {
       address: msg.address || '',
       phone_no: msg.phone_no || '',
       email: msg.email || '',
+      company_description: msg.company_description || '',
     }
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
@@ -399,6 +401,32 @@ export async function getTestimonials() {
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
       console.error('[ERP] getTestimonials failed', getApiErrorMessage(err))
+    }
+    return fallback
+  }
+}
+
+// ---------------------------------------------------------------------------
+// About Us – single doctype (title, subtitle, description, cards, leadership)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch About Us content from ERP (single doctype).
+ * Fields: title, subtitle, description, image; aboutus_section (title, details); leadership_title, leadership_subtitle; aboutus_leadership (image, name1, designation, team_detail).
+ * @returns {Promise<{ success: boolean, data?: object, error?: string }>}
+ */
+export async function getAboutUs() {
+  const fallback = { success: false, data: null, error: 'Failed to load about us' }
+  try {
+    const res = await callERPMethod('ndis_erp.ndis_erp.api.get_about_us', {}, { method: 'GET' })
+    const msg = res?.message
+    if (msg?.success && msg.data) {
+      return { success: true, data: msg.data }
+    }
+    return { success: false, data: null, error: msg?.error || fallback.error }
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[ERP] getAboutUs failed', getApiErrorMessage(err))
     }
     return fallback
   }
