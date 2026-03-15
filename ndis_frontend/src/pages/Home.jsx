@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
 import { services as fallbackServices } from '../services/services'
 import { getHomeHero, getErpFileUrl, getTestimonials, getServices, getAboutUs } from '../erp_services/erp'
+import aboutUsFallbackImage from '../assets/img/pcds.jpeg'
 
 const whyChooseUsFallback = [
   {
@@ -378,18 +379,16 @@ function Home() {
               </ul>
             </div>
             <div className="flex items-center justify-center">
-              {aboutData?.image ? (
-                <img
-                  src={getErpFileUrl(aboutData.image)}
-                  alt="About us"
-                  className="w-full max-w-md rounded-2xl object-cover shadow-lg border border-slate-100"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full max-w-md rounded-2xl bg-gradient-to-br from-primary-500/5 to-primary-700/10 border border-dashed border-primary-200 flex items-center justify-center text-sm text-primary-700/70 py-16 px-6 text-center">
-                  Configure an image on the About Us page to show it here.
-                </div>
-              )}
+              <img
+                src={aboutData?.image ? getErpFileUrl(aboutData.image) : aboutUsFallbackImage}
+                alt="About us"
+                className="w-full max-w-md rounded-2xl object-cover shadow-lg border border-slate-100"
+                loading="lazy"
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = aboutUsFallbackImage
+                }}
+              />
             </div>
           </div>
         </div>

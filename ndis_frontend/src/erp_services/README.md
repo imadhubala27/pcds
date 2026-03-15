@@ -31,11 +31,11 @@ This folder contains the **ERP service layer** that connects the React app to th
 
 - `.env` – default values (committed example).
 - `.env.development` – used when running `yarn dev` / `vite`.
-- `.env.production` – used when building for production. Set `VITE_ERP_BASE_URL` to your live ERP site.
+- `.env.production` – used when building for production. Set `VITE_ERP_BASE_URL` to your live ERP site (e.g. `https://perfectioncare.au`).
 
 Variables:
 
-- `VITE_ERP_BASE_URL` – ERP site URL (e.g. `http://127.0.0.1:8007`).
+- `VITE_ERP_BASE_URL` – ERP site URL (dev: `http://127.0.0.1:8007`, production: `https://perfectioncare.au`).
 - `VITE_API_PREFIX` – API path prefix (default `/api/method`).
 
 ## Usage example
