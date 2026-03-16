@@ -39,6 +39,9 @@ const erpClient = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
+  // Make Axios play nicely with Frappe's CSRF protection
+  xsrfCookieName: 'csrf_token',
+  xsrfHeaderName: 'X-Frappe-CSRF-Token',
   timeout: 30000,
 })
 
@@ -51,6 +54,10 @@ erpClient.interceptors.request.use(
     if (s) {
       config.headers['X-Frappe-SID'] = s
       config.headers.Cookie = config.headers.Cookie ? `${config.headers.Cookie}; sid=${s}` : `sid=${s}`
+    }
+    // Also forward CSRF token if Frappe exposes it on window (e.g. in desk/website templates)
+    if (typeof window !== 'undefined' && window.csrf_token) {
+      config.headers['X-Frappe-CSRF-Token'] = window.csrf_token
     }
     return config
   },
